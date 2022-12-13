@@ -5,7 +5,7 @@ resource "openstack_compute_keypair_v2" "my-cloud-key" {
 
 resource "openstack_compute_instance_v2" "kube-admin" {
   name            = "prod"
-  image_name      = "cirros"
+  image_name      = "bionic-server-cloudimg-amd64"
   flavor_name     = "m1.medium"
   key_pair        = "${openstack_compute_keypair_v2.my-cloud-key.name}"
   security_groups = ["default"]
@@ -17,7 +17,7 @@ resource "openstack_compute_instance_v2" "kube-admin" {
 
 resource "openstack_compute_instance_v2" "kube-node" {
   name            = "prod"
-  image_name      = "cirros"
+  image_name      = "bionic-server-cloudimg-amd64"
   flavor_name     = "m1.small"
   key_pair        = "${openstack_compute_keypair_v2.my-cloud-key.name}"
   security_groups = ["default"]
