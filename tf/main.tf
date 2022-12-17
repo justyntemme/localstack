@@ -1,63 +1,65 @@
-# Variables
-variable "keypair" {
-  type    = string
-  default = "user-key"   # name of keypair created 
-}
-
-variable "network" {
-  type    = string
-  default = "private" # default network to be used
-}
-
-variable "security_groups" {
+variable "dns_ip" {
   type    = list(string)
-  default = ["default"]  # Name of default security group
+  default = ["8.8.8.8", "8.8.8.4"]
 }
 
-# Data sources
-## Get Image ID
-data "openstack_images_image_v2" "image" {
-  name        = "debian-10-openstack-amd64" # Name of image to be used
-  most_recent = true
+#### VM parameters
+variable "flavor_http" {
+  type    = string
+  default = "t2.medium"
 }
 
-## Get flavor id
-data "openstack_compute_flavor_v2" "flavor" {
-  name = "m1.small" # flavor to be used
-}
-
-# Create an instance
-resource "openstack_compute_instance_v2" "server" {
-  name            = "k8s-controller"  #Instance name
-  image_id        = data.openstack_images_image_v2.image.id
-  flavor_id       = data.openstack_compute_flavor_v2.flavor.id
-  key_pair        = var.keypair
-  security_groups = var.security_groups
-
-  network {
-    name = var.network
+variable "network_http" {
+  type = map(string)
+  default = {
+    subnet_name = "subnet-http"
+    cidr        = "192.168.1.0/24"
   }
 }
 
-# Output VM IP Address
-output "serverip" {
- value = openstack_compute_instance_v2.server.access_ip_v4
+resource "openstack_compute_keypair_v2" "admin-key" {
+  name       = "admin-key"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDCEnqNV952JH/92X+98nfvGOcxFmPthfAR77IZyjSh27uAmXOYQ3lLmkNN7m/AW/kSxxeEs7ZHRyygGqBqG8ifp98uRqSsq1gF5EIkPKBeH8j5/OtJxWxNx1xuSrGD/Ukyqy6DS4IBu46hV6ASfOTRTcYcELeRYBRPf2/8s69epVBE0anWl0WqOH2FN4z2Sgv7Yx/YYW739v2FK7ivZ/WrZ3/9mO6UVbE3tqk3RsHaWuk5+j8Dh2yHUYDCGhGFvjqECoi7i1ah4w9Qu6q17ZyH9JKr2ibannGCiqPivAAClsB4/nOwUs/zqb7Bs67oFb0Rxu76MMVAMd8jWfioEovn ssh"
 }
 
-# Add Floating ip
-resource "openstack_networking_floatingip_v2" "fip1" {
-  pool = "external-network"
+resource "openstack_compute_instance_v2" "k8s-leader" {
+  name            = "k8s-leader"
+  image_name      = "cirros"
+  flavor_name     = "m1.small"
+  key_pair        = "${openstack_compute_keypair_v2.admin-key.name}"
+  security_groups = ["default"]
+  depends_on = ["openstack_networking_subnet_v2.http"]
+
+  network {
+    name = "network-generic"
+  }
 }
 
-resource "openstack_compute_floatingip_associate_v2" "fip1" {
-  floating_ip = openstack_networking_floatingip_v2.fip1.address
-  instance_id = openstack_compute_instance_v2.server.id
+#### NETWORK CONFIGURATION ####
+
+# # Router creation
+# resource "openstack_networking_router_v2" "generic" {
+#   name                = "router-generic"
+#   external_network_id = var.external_gateway
+# }
+
+# Network creation
+resource "openstack_networking_network_v2" "generic" {
+  name = "network-generic"
 }
 
-# Output VM IP Addresses
-output "server_private_ip" {
- value = openstack_compute_instance_v2.server.access_ip_v4
+#### HTTP SUBNET ####
+
+# Subnet http configuration
+resource "openstack_networking_subnet_v2" "http" {
+  name            = var.network_http["subnet_name"]
+  network_id      = openstack_networking_network_v2.generic.id
+  cidr            = var.network_http["cidr"]
+  dns_nameservers = var.dns_ip
 }
-output "server_floating_ip" {
- value = openstack_networking_floatingip_v2.fip1.address
-}
+
+# Router interface configuration
+# resource "openstack_networking_router_interface_v2" "http" {
+#   router_id = openstack_networking_router_v2.generic.id
+#   subnet_id = openstack_networking_subnet_v2.http.id
+# }
