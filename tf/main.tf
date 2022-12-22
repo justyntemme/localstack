@@ -1,6 +1,7 @@
 # Create a new OpenStack network
 resource "openstack_networking_network_v2" "k8s" {
   name = "k8s-network"
+  shared = true
 }
 
 # Create a new OpenStack floating IP
