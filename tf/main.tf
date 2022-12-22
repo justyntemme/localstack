@@ -4,10 +4,9 @@ resource "openstack_networking_network_v2" "k8s" {
 }
 
 # Create a new OpenStack floating IP
-resource "openstack_compute_floatingip_v2" "example" {
+resource "openstack_compute_floatingip_v2" "fip_1" {
   pool = "external"
 }
-
 
 # Create a new OpenStack subnet
 resource "openstack_networking_subnet_v2" "k8s" {
@@ -20,12 +19,6 @@ resource "openstack_networking_subnet_v2" "k8s" {
 resource "openstack_networking_router_v2" "k8s" {
   name         = "k8s-router"
   external_network_id = "f9690377-d6a7-45b4-bd9a-82e728383cfb"
-}
-
-# Connect the router to the subnet
-resource "openstack_networking_router_interface_v2" "k8s" {
-  router_id = openstack_networking_router_v2.k8s.id
-  subnet_id = openstack_networking_subnet_v2.k8s.id
 }
 
 # Create a new OpenStack security group
@@ -73,7 +66,10 @@ resource "openstack_compute_instance_v2" "k8s-controller" {
   network {
     name = openstack_networking_network_v2.k8s.name
   }
+}
 
-  # Associate a floating IP with the instance
-  floating_ip = openstack_compute_floatingip_v2.example.address
+# Associate the floating IP with the instance
+resource "openstack_compute_floatingip_associate_v2" "example" {
+  floating_ip = openstack_compute_floatingip_v2.fip_1.address
+  instance_id = openstack_compute_instance_v2.k8s-controller.id
 }
