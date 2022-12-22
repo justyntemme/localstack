@@ -13,7 +13,7 @@ resource "openstack_networking_subnet_v2" "k8s" {
 # Create a new OpenStack router
 resource "openstack_networking_router_v2" "k8s" {
   name         = "k8s-router"
-  external_gateway = "EXTERNAL_NETWORK_ID"
+  external_network_id = "f9690377-d6a7-45b4-bd9a-82e728383cfb"
 }
 
 # Connect the router to the subnet
@@ -39,7 +39,7 @@ resource "openstack_compute_secgroup_v2" "k8s" {
 # Create a new OpenStack key pair
 resource "openstack_compute_keypair_v2" "k8s" {
   name      = "k8s-keypair"
-  public_key = "PUBLIC_KEY"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDCEnqNV952JH/92X+98nfvGOcxFmPthfAR77IZyjSh27uAmXOYQ3lLmkNN7m/AW/kSxxeEs7ZHRyygGqBqG8ifp98uRqSsq1gF5EIkPKBeH8j5/OtJxWxNx1xuSrGD/Ukyqy6DS4IBu46hV6ASfOTRTcYcELeRYBRPf2/8s69epVBE0anWl0WqOH2FN4z2Sgv7Yx/YYW739v2FK7ivZ/WrZ3/9mO6UVbE3tqk3RsHaWuk5+j8Dh2yHUYDCGhGFvjqECoi7i1ah4w9Qu6q17ZyH9JKr2ibannGCiqPivAAClsB4/nOwUs/zqb7Bs67oFb0Rxu76MMVAMd8jWfioEovn ssh"
 }
 
 # Create a new OpenStack instance
@@ -47,8 +47,8 @@ resource "openstack_compute_instance_v2" "k8s" {
   name            = "k8s-instance"
   security_groups = [openstack_compute_secgroup_v2.k8s.name]
   key_pair        = openstack_compute_keypair_v2.k8s.name
-  flavor_name     = "FLAVOR_NAME"
-  image_name      = "IMAGE_NAME"
+  flavor_name     = "m1.medium"
+  image_name      = "ubuntu-cloudimg-amd64"
 
   network {
     name = openstack_networking_network_v2.k8s.name
