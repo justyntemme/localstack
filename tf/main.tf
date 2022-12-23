@@ -28,8 +28,8 @@ resource "openstack_networking_router_v2" "k8s-router" {
 }
 
 # Create a new OpenStack security group
-resource "openstack_compute_secgroup_v2" "k8s-security-group" {
-  name        = "k8s-security-group"
+resource "openstack_compute_secgroup_v2" "k8s-sec-group" {
+  name        = "k8s-sec-group"
   description = "k8s security group"
 
   # Allow SSH access
@@ -51,7 +51,7 @@ resource "openstack_compute_keypair_v2" "k8s-keypair" {
 resource "openstack_compute_instance_v2" "kube-node"{
   name            = "k8s-instance-${count.index}"
   count = 2
-  security_groups = [openstack_compute_secgroup_v2.k8s-security-group.name]
+  security_groups = [openstack_compute_secgroup_v2.k8s-sec-group.name]
   key_pair        = openstack_compute_keypair_v2.k8s-keypair.name
   flavor_name     = "m1.medium"
   image_name      = "ubuntu-cloudimg-amd64"
@@ -64,7 +64,7 @@ resource "openstack_compute_instance_v2" "kube-node"{
 # Create a new OpenStack instance
 resource "openstack_compute_instance_v2" "k8s-controller" {
   name            = "k8s-controller"
-  security_groups = [openstack_compute_secgroup_v2.k8s-secuity-group.name]
+  security_groups = [openstack_compute_secgroup_v2.k8s-sec-group.name]
   key_pair        = openstack_compute_keypair_v2.k8s-keypair.name
   flavor_name     = "m1.medium"
   image_name      = "ubuntu-cloudimg-amd64"
