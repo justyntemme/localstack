@@ -40,27 +40,24 @@ resource "openstack_compute_secgroup_v2" "k8s-sec-group" {
     cidr        = "0.0.0.0/0"
   }
 
- rule {
-    from_port = -1
-    to_port = -1
-    ip_protocol = "icmp"
-    cidr        = "0.0.0.0/0"
-    # self = true
-  }
-      rule {
+  rule {
     from_port = 443
     to_port = 443
     ip_protocol = "tcp"
     cidr        = "0.0.0.0/0"
-    # self = true
   }
 
-    rule {
+  rule {
     from_port = 80
     to_port = 80
     ip_protocol = "tcp"
     cidr        = "0.0.0.0/0"
-    # self = true
+  }  
+  rule {
+    from_port = 80
+    to_port = 80
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
   }
 }
 
