@@ -37,7 +37,7 @@ resource "openstack_compute_secgroup_v2" "k8s-sec-group" {
     from_port   = 22
     to_port     = 22
     ip_protocol = "tcp"
-    cidr        = "0.0.0.0/0"
+    cidr        = "::/0"
   }
 
  rule {
@@ -46,12 +46,19 @@ resource "openstack_compute_secgroup_v2" "k8s-sec-group" {
     ip_protocol = "icmp"
     self = true
   }
+      rule {
+    from_port = 443
+    to_port = 443
+    ip_protocol = "tcp"
+    cidr        = "::/0"
+    # self = true
+  }
 
     rule {
     from_port = 80
     to_port = 80
     ip_protocol = "tcp"
-    cidr        = "0.0.0.0/0"
+    cidr        = "::/0"
     # self = true
   }
 }
@@ -70,6 +77,7 @@ resource "openstack_compute_instance_v2" "kube-node"{
   key_pair        = openstack_compute_keypair_v2.k8s-keypair.name
   flavor_name     = "m1.medium"
   image_name      = "ubuntu-cloudimg-amd64"
+  depends_on = ["openstack_networking_subnet_v2.k8s-subnet"]
 
   network {
     name = openstack_networking_network_v2.k8s-network.name
@@ -83,6 +91,7 @@ resource "openstack_compute_instance_v2" "k8s-controller" {
   key_pair        = openstack_compute_keypair_v2.k8s-keypair.name
   flavor_name     = "m1.medium"
   image_name      = "ubuntu-cloudimg-amd64"
+  depends_on = ["openstack_networking_subnet_v2.k8s-subnet"]
 
   network {
     name = openstack_networking_network_v2.k8s-network.name
