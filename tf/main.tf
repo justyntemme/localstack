@@ -4,10 +4,10 @@ resource "openstack_networking_network_v2" "k8s-network" {
   shared = true
 }
 
-# # Create a new OpenStack floating IP
-# resource "openstack_compute_floatingip_v2" "fip_1" {
-#   pool = "external"
-# }
+# Create a new OpenStack floating IP
+resource "openstack_compute_floatingip_v2" "fip_1" {
+  pool = "external"
+}
 
 # Create a new OpenStack subnet
 resource "openstack_networking_subnet_v2" "k8s-subnet" {
@@ -38,6 +38,20 @@ resource "openstack_compute_secgroup_v2" "k8s-sec-group" {
     to_port     = 22
     ip_protocol = "tcp"
     cidr        = "0.0.0.0/0"
+  }
+
+  rule {
+    from_port = 1
+    to_port = 65535
+    ip_protocol = "icmp"
+    # self = true
+  }
+
+    rule {
+    from_port = 80
+    to_port = 80
+    ip_protocol = "http"
+    # self = true
   }
 }
 
@@ -74,8 +88,8 @@ resource "openstack_compute_instance_v2" "k8s-controller" {
   }
 }
 
-# # Associate the floating IP with the instance
-# resource "openstack_compute_floatingip_associate_v2" "k8s" {
-#   floating_ip = openstack_compute_floatingip_v2.fip_1.address
-#   instance_id = openstack_compute_instance_v2.k8s-controller.id
-# }
+# Associate the floating IP with the instance
+resource "openstack_compute_floatingip_associate_v2" "k8s-fip" {
+  floating_ip = openstack_compute_floatingip_v2.fip_1.address
+  instance_id = openstack_compute_instance_v2.k8s-controller.id
+}
