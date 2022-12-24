@@ -44,7 +44,8 @@ resource "openstack_compute_secgroup_v2" "k8s-sec-group" {
     from_port = -1
     to_port = -1
     ip_protocol = "icmp"
-    self = true
+    cidr        = "0.0.0.0/0"
+    # self = true
   }
       rule {
     from_port = 443
