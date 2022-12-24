@@ -54,9 +54,33 @@ resource "openstack_compute_secgroup_v2" "k8s-sec-group" {
     cidr        = "0.0.0.0/0"
   }  
   rule {
-    from_port = 80
-    to_port = 80
+    from_port = 8080
+    to_port = 8080
     ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
+   rule {
+    from_port =30000
+    to_port = 32767
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
+    rule {
+    from_port = 10250
+    to_port = 10250
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
+    rule {
+    from_port = 500
+    to_port = 500
+    ip_protocol = "udp"
+    cidr        = "0.0.0.0/0"
+  }
+     rule {
+    from_port = 4500
+    to_port = 4500
+    ip_protocol = "udp"
     cidr        = "0.0.0.0/0"
   }
 }
