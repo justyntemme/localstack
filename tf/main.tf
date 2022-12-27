@@ -1,3 +1,7 @@
+# Replace external network ID with the correct value
+
+# Ensure snap is installed with -devmode to enable volumes
+
 # Create a new OpenStack network
 resource "openstack_networking_network_v2" "k8s-network" {
   name = "k8s-network"
@@ -24,7 +28,7 @@ resource "openstack_networking_router_interface_v2" "k8s-router-interface" {
 # Create a new OpenStack router
 resource "openstack_networking_router_v2" "k8s-router" {
   name         = "k8s-router"
-  external_network_id = "f9690377-d6a7-45b4-bd9a-82e728383cfb"
+  external_network_id = "cccf2f63-160d-4e11-ac56-024cf6b1d94c"
 }
 
 # Create a new OpenStack security group
@@ -127,7 +131,7 @@ resource "openstack_compute_floatingip_associate_v2" "k8s-fip" {
 }
 
 resource "openstack_blockstorage_volume_v3" "volume_1" {
-  region      = "RegionOne"
+  region      = "microstack"
   name        = "volume_1"
   description = "first test volume"
   size        = 3
