@@ -111,7 +111,7 @@ resource "openstack_compute_instance_v2" "k8s-controller" {
   name            = "k8s-controller"
   security_groups = [openstack_compute_secgroup_v2.k8s-sec-group.name]
   key_pair        = openstack_compute_keypair_v2.k8s-keypair.name
-  flavor_name     = "m1.medium"
+  flavor_name     = "m1.small"
   image_name      = "ubuntu-cloudimg-amd64"
   depends_on = [openstack_networking_subnet_v2.k8s-subnet]
 
@@ -124,4 +124,11 @@ resource "openstack_compute_instance_v2" "k8s-controller" {
 resource "openstack_compute_floatingip_associate_v2" "k8s-fip" {
   floating_ip = openstack_compute_floatingip_v2.fip_1.address
   instance_id = openstack_compute_instance_v2.k8s-controller.id
+}
+
+resource "openstack_blockstorage_volume_v3" "volume_1" {
+  region      = "RegionOne"
+  name        = "volume_1"
+  description = "first test volume"
+  size        = 3
 }
