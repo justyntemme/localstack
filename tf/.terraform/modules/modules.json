@@ -1,0 +1,1 @@
+{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"persistent-storage","Source":"registry.terraform.io/jd4883/persistent-storage/kubernetes","Version":"0.1.8","Dir":".terraform/modules/persistent-storage"}]}

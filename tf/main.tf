@@ -43,7 +43,7 @@ resource "openstack_networking_router_interface_v2" "k8s-router-interface" {
 # Create a new OpenStack router
 resource "openstack_networking_router_v2" "k8s-router" {
   name         = "k8s-router"
-  external_network_id = "cccf2f63-160d-4e11-ac56-024cf6b1d94c"
+  external_network_id = "a1827fa1-9fd3-4e63-bc1a-7adc41f008fa"
 }
 
 # Create a new OpenStack security group
