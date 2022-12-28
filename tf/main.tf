@@ -1,6 +1,9 @@
 # Replace external network ID with the correct value
 
 # Ensure snap is installed with -devmode to enable volumes
+# run 'sudo sysctl net.ipv4.ip_forward=1' on the host machine to ensure networks can connect
+# As well as editing the external-network to be 'shared'
+# always sudo ufw disable on host 
 
 # Create a new OpenStack network
 resource "openstack_networking_network_v2" "k8s-network" {
@@ -15,7 +18,7 @@ resource "openstack_compute_floatingip_v2" "fip_1" {
 
 # Create a new OpenStack subnet
 resource "openstack_networking_subnet_v2" "k8s-subnet" {
-  network_id = openstack_networking_network_v2.k8s-network.id
+  network_id = openstack_networking_network_v2.external.id
   cidr       = "192.168.0.0/24"
   ip_version = 4
 }
